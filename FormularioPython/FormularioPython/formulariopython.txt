@@ -1,0 +1,7 @@
+Nombres: jose francisco
+Apellidos: pena morales
+Edad: 19
+Estatura: 175
+Telefono: 1234567890
+Genero: Hombre
+
