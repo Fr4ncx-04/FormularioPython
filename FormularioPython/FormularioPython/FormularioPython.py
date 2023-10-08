@@ -1,17 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
+import re
 
-def limpiar_campos():
-    entry_nombres.delete(0, tk.END)
-    entry_apellidos.delete(0, tk.END)
-    entry_edad.delete(0, tk.END)
-    entry_estatura.delete(0, tk.END)
-    entry_telefono.delete(0, tk.END)
-    var_genero.set(0)
-    
-def Borrar_Campos():
-    limpiar_campos()
-    
 def Guardar_Datos():
     #obtener los datos de los campos
     nombres = entry_nombres.get()
@@ -27,17 +17,25 @@ def Guardar_Datos():
     elif var_genero.get() == 2:
         genero = "Mujer"
         
-    #crear una cadena con los datos
-    datos = f"Nombres: {nombres}\nApellidos: {apellidos}\nEdad: {edad}\nEstatura: {estatura}\nTelefono: {telefono}\nGenero: {genero}"
+    #validar que los campos tengan el formato correcto
+    if (es_entero_valido(edad) and es_decimal_valido(estatura) and 
+        es_entero_valido_de_10_digitos(telefono) and es_texto_valido(nombres) and es_texto_valido(apellidos)):      
+        #crear una cadena con los datos
+        datos = f"Nombres: {nombres}\nApellidos: {apellidos}\nEdad: {edad}\nEstatura: {estatura}\nTelefono: {telefono}\nGenero: {genero}"
     
-    #guardar los datos en un archivo de texto
-    with open("formulariopython.txt","a") as archivo:
-        archivo.write(datos + "\n\n")
+        #guardar los datos en un archivo de texto
+        with open("formulariopython.txt","a") as archivo:
+            archivo.write(datos + "\n\n")
         
-    #mostrar un mensaje con los datos capturados
-    messagebox.showinfo("informacion", "datos guardados con exito: \n\n" + datos)
+        #mostrar un mensaje con los datos capturados
+        messagebox.showinfo("informacion", "datos guardados con exito: \n\n" + datos)
+        
+        #limpiar controles despues de guardar
+        limpiar_campos()
+    else:
+        messagebox.showerror("Error", "Por Favor, ingrese datos validos en los campos.")
     
-    #limpiar los controles despues de guardar
+def limpiar_campos():
     entry_nombres.delete(0, tk.END)
     entry_apellidos.delete(0, tk.END)
     entry_edad.delete(0, tk.END)
@@ -45,9 +43,29 @@ def Guardar_Datos():
     entry_telefono.delete(0, tk.END)
     var_genero.set(0)
     
+def es_entero_valido(valor):
+    try:
+        int(valor)
+        return True
+    except ValueError:
+        return False
+    
+def es_decimal_valido(valor):
+    try:
+        float(valor)
+        return True
+    except ValueError:
+        return False
+    
+def es_entero_valido_de_10_digitos(valor):
+    return valor.isdigit() and len(valor)==10
+
+def es_texto_valido(valor):
+    return bool(re.match("[a-zA-Z\s]+$", valor))
+    
 #crear la ventana principal
 ventana = tk.Tk()
-ventana.title("FormularioPy")
+ventana.title("Formulario")
 
 #crear variables para los radiobuttons
 var_genero = tk.IntVar()
@@ -92,7 +110,7 @@ btn_guardar = tk.Button(ventana, text="Guardar", command=Guardar_Datos)
 btn_guardar.pack()
 
 #boton para borrar campos
-btn_borrar = tk.Button(ventana, text="Borrar Campos", command=Borrar_Campos)
+btn_borrar = tk.Button(ventana, text="Borrar Campos", command=limpiar_campos)
 btn_borrar.pack()
 
 #iniciar la aplicacion
